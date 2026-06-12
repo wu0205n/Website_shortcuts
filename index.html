@@ -6,11 +6,13 @@
     <title>專屬網址管理員</title>
     <style>
         :root {
-            --primary-color: #4A90E2;
-            --bg-color: #F5F7FA;
-            --card-bg: #FFFFFF;
-            --text-main: #333333;
-            --text-muted: #777777;
+            /* 抽換為深色系變數配置 */
+            --primary-color: #58a6ff;
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --border-color: #30363d;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,10 +26,11 @@
         .container {
             background-color: var(--card-bg);
             border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             width: 100%;
             max-width: 600px;
             padding: 2rem;
+            border: 1px solid var(--border-color);
         }
         h1 {
             text-align: center;
@@ -42,22 +45,34 @@
         }
         input[type="text"], input[type="url"] {
             padding: 0.8rem;
-            border: 1px solid #ccc;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 1rem;
         }
+        input::placeholder {
+            color: var(--text-muted);
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
         button {
             background-color: var(--primary-color);
-            color: white;
+            color: #0d1117;
             border: none;
             padding: 0.8rem;
             border-radius: 6px;
             font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            font-weight: 600;
         }
         button:hover {
-            background-color: #357ABD;
+            background-color: #1f6feb;
+            color: #ffffff;
         }
         .link-list {
             list-style: none;
@@ -69,14 +84,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             transition: background-color 0.2s ease;
         }
         .link-item:last-child {
             border-bottom: none;
         }
         .link-item:hover {
-            background-color: #f9f9f9;
+            background-color: #21262d;
+            border-radius: 6px;
         }
         .link-name {
             font-weight: bold;
@@ -88,12 +104,14 @@
             text-decoration: underline;
         }
         .delete-btn {
-            background-color: #e74c3c;
+            background-color: #da3633;
+            color: #ffffff;
             padding: 0.4rem 0.8rem;
             font-size: 0.9rem;
+            border-radius: 6px;
         }
         .delete-btn:hover {
-            background-color: #c0392b;
+            background-color: #b3261e;
         }
     </style>
 </head>
@@ -113,7 +131,6 @@
 </div>
 
 <script>
-    // 網頁載入時，從 LocalStorage 讀取並渲染清單
     document.addEventListener("DOMContentLoaded", renderLinks);
 
     function addLink() {
@@ -127,7 +144,6 @@
             return;
         }
 
-        // 簡單的網址格式檢查
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
             alert("網址必須以 http:// 或 https:// 開頭！");
             return;
@@ -160,7 +176,7 @@
         linkList.innerHTML = '';
 
         if (links.length === 0) {
-            linkList.innerHTML = '<li style="text-align: center; color: var(--text-muted);">目前尚無網址，請從上方新增。</li>';
+            linkList.innerHTML = '<li style="text-align: center; color: var(--text-muted); border: none;">目前尚無網址，請從上方新增。</li>';
             return;
         }
 
