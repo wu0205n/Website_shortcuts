@@ -6,7 +6,6 @@
     <title>專屬網址管理員</title>
     <style>
         :root {
-            /* 抽換為深色系變數配置 */
             --primary-color: #58a6ff;
             --bg-color: #0d1117;
             --card-bg: #161b22;
@@ -35,7 +34,6 @@
             max-width: 600px;
             padding: 2rem;
             border: 1px solid var(--border-color);
-            transition: max-width 0.3s ease; /* 點擊預覽時平滑拓寬容器 */
         }
         h1 {
             font-size: 1.8rem;
@@ -48,7 +46,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         input {
             background-color: var(--bg-color);
@@ -78,6 +76,16 @@
         button:hover {
             background-color: #2ea44f;
         }
+        .tip-box {
+            background-color: #0d1117;
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
         .link-list {
             list-style: none;
             padding: 0;
@@ -98,7 +106,6 @@
             text-decoration: none;
             font-weight: 500;
             font-size: 1.1rem;
-            cursor: pointer;
         }
         .link-name:hover {
             text-decoration: underline;
@@ -116,65 +123,6 @@
             background-color: var(--danger-color);
             color: #ffffff;
         }
-
-        /* 新增：網頁內嵌預覽區塊樣式 */
-        .preview-card {
-            margin-top: 2rem;
-            border-top: 1px solid var(--border-color);
-            padding-top: 1.5rem;
-            display: none;
-        }
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .preview-title {
-            color: var(--primary-color);
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .preview-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .preview-actions a {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            text-decoration: none;
-        }
-        .preview-actions a:hover {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-        .btn-close {
-            background-color: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 0.25rem 0.5rem;
-            font-size: 0.85rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn-close:hover {
-            background-color: #21262d;
-            color: var(--text-main);
-        }
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: #ffffff;
-        }
-        .warning-text {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-            line-height: 1.4;
-        }
     </style>
 </head>
 <body>
@@ -188,22 +136,15 @@
         <button onclick="addLink()">新增網址</button>
     </div>
 
+    <div class="tip-box">
+        💡 <b>背景開啟秘訣：</b><br>
+        由於瀏覽器安全限制，請主動透過以下方式點擊連結，即可在背景開啟新分頁，同時畫面維持留在本頁面：<br>
+        1. 按住鍵盤 <b>Ctrl 鍵 + 滑鼠左鍵</b> 點擊。<br>
+        2. 直接使用 <b>滑鼠中鍵（滾輪）</b> 點擊。
+    </div>
+
     <ul id="linkList" class="link-list">
         </ul>
-
-    <div id="previewCard" class="preview-card">
-        <div class="preview-header">
-            <span id="previewTitle" class="preview-title">網頁預覽</span>
-            <div class="preview-actions">
-                <a id="openExternalBtn" href="#" target="_blank">在新分頁開啟 ↗</a>
-                <button class="btn-close" onclick="closePreview()">✕ 關閉預覽</button>
-            </div>
-        </div>
-        <iframe id="previewIframe" src=""></iframe>
-        <div class="warning-text">
-            💡 提示：若上方視窗顯示空白或拒絕連線，代表該網站設定了安全防護（禁止嵌入），請點選右上角「在新分頁開啟」。
-        </div>
-    </div>
 </div>
 
 <script>
@@ -246,9 +187,6 @@
         let links = getLinks();
         links = links.filter(link => link.id !== id);
         localStorage.setItem('myLinks', JSON.stringify(links));
-        
-        // 若刪除的正是目前在預覽的網址，則關閉預覽
-        closePreview();
         renderLinks();
     }
 
@@ -278,13 +216,13 @@
             const li = document.createElement('li');
             li.className = 'link-item';
             
-            // 安全性優化：改採用標準 DOM 事件監聽，避免引號破壞屬性常規
+            // 使用標準 target="_blank" 確保點擊可以開新分頁
             const a = document.createElement('a');
             a.className = 'link-name';
+            a.href = link.url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer'; // 提升安全性的標準屬性
             a.textContent = link.name;
-            a.addEventListener('click', function() {
-                openPreview(link.url, link.name);
-            });
 
             const btn = document.createElement('button');
             btn.className = 'btn-delete';
@@ -297,34 +235,6 @@
             li.appendChild(btn);
             linkList.appendChild(li);
         });
-    }
-
-    // 新增：開啟內嵌預覽
-    function openPreview(url, name) {
-        const container = document.querySelector('.container');
-        const previewCard = document.getElementById('previewCard');
-        const previewIframe = document.getElementById('previewIframe');
-        const previewTitle = document.getElementById('previewTitle');
-        const openExternalBtn = document.getElementById('openExternalBtn');
-
-        previewTitle.textContent = `預覽：${name}`;
-        previewIframe.src = url;
-        openExternalBtn.href = url;
-
-        // 打開預覽時，將主容器拓寬至 900px 以獲得更好的瀏覽體驗
-        container.style.maxWidth = '900px';
-        previewCard.style.display = 'block';
-    }
-
-    // 新增：關閉內嵌預覽
-    function closePreview() {
-        const container = document.querySelector('.container');
-        const previewCard = document.getElementById('previewCard');
-        const previewIframe = document.getElementById('previewIframe');
-
-        previewIframe.src = '';
-        container.style.maxWidth = '600px';
-        previewCard.style.display = 'none';
     }
 </script>
 
